@@ -1,0 +1,97 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /login:
+    post:
+      summary: login user
+      operationId: loginUser
+      requestBody:
+        description: parameters for login
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+  /logout:
+    post:
+      summary: logout logged inuser
+      operationId: logoutUser
+      responses:
+        '200':
+          description: logout successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+  /home:
+    get:
+      summary: list user details
+      operationId: listUserDetails
+      responses:
+        '200':
+          description: list user details successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+components:
+  schemas:
+    message:
+      description: message
+      type: object
+      required:
+        - msg
+      properties:
+        msg:
+          type: string
+    user:
+      description: logged in user details
+      type: object
+      required:
+        - name
+        - username
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+    loginUser:
+      description: users login credentials
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
