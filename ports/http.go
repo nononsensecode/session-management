@@ -52,29 +52,40 @@ func (s HttpServer) LoginUser(w http.ResponseWriter, r *http.Request) {
 		Name:     u.Name,
 		Username: u.UserName,
 	}
+	s.sessionManager.Put(r.Context(), "user", user.Username)
+
 	w.WriteHeader(http.StatusOK)
 	render.Render(w, r, &user)
-	s.sessionManager.Put(r.Context(), "user", user.Username)
 }
 
 func (s HttpServer) LogoutUser(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("request came to logout the user")
 	s.sessionManager.Destroy(r.Context())
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s HttpServer) ListUserDetails(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("request came to list user details")
-	u := s.sessionManager.GetString(r.Context(), "user")
-	if u == "" {
-		logrus.Warnf("session empty")
+	username := s.sessionManager.GetString(r.Context(), "user")
+	if username == "" {
+		logrus.Warn("session empty")
 		s.LogoutUser(w, r)
+		return
+	}
+	u, err := s.repo.FindByUsername(username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		m := Message{Msg: "there is no such user"}
+		render.Render(w, r, &m)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(u))
-
+	user := User{
+		Name:     u.Name,
+		Username: u.UserName,
+	}
+	render.Render(w, r, &user)
 }
 
 func (b *LoginUserJSONRequestBody) Bind(r *http.Request) error {

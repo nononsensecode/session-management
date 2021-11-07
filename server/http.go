@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
-
 )
 
 func RunHTTPServerOnAddr(addr string, createHandler func(router chi.Router) http.Handler, sessionManager *scs.SessionManager) {
@@ -22,7 +21,7 @@ func RunHTTPServerOnAddr(addr string, createHandler func(router chi.Router) http
 
 	logrus.Info("Starting HTTP server")
 
-	http.ListenAndServe(addr, sessionManager.LoadAndSave(rootRouter))
+	logrus.Fatal(http.ListenAndServe(addr, sessionManager.LoadAndSave(rootRouter)))
 }
 
 func setMiddlewares(router *chi.Mux) {
@@ -49,7 +48,7 @@ func addCorsMiddleware(router *chi.Mux) {
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Access-Control-Allow-Credentials"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300,

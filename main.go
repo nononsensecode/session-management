@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	client *redis.Client
+	client         *redis.Client
 	sessionManager *scs.SessionManager
 )
 
@@ -31,14 +31,14 @@ func initRedisClient() {
 		panic("please enter a valid db number")
 	}
 	client = redis.NewClient(&redis.Options{
-		Addr: host + ":" + port,
+		Addr:     host + ":" + port,
 		Password: password,
-		DB: db,
+		DB:       db,
 	})
 }
 
 func initSessionManager(ctx context.Context, prefix string) {
-	store := redis2.NewRedisStore(ctx, client, prefix)
+	store := redis2.NewRedisStore(client, ctx)
 	sessionManager = scs.New()
 	sessionManager.Store = store
 	sessionManager.IdleTimeout = 15 * time.Minute

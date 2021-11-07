@@ -9,4 +9,5 @@ type User struct {
 
 type UserRepository interface {
 	Find(username, password string) (User, error)
+	FindByUsername(username string) (User, error)
 }
